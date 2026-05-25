@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}🔧 Setting up server for Speech Labeling Interface${NC}"
-echo -e "${BLUE}📚 CS6620 Week 2: SSH Deployment Lab${NC}"
+echo -e "${BLUE}📚 CS6620 Week 2: SSH Deployment Lab${NC} V1.0.1"
 
 # Check if running as ec2-user
 if [ "$USER" != "ec2-user" ]; then
