@@ -1,0 +1,25 @@
+name: Build and push Docker image
+
+on: 
+  push:
+    branches: [ "week02" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/cs6620-app:latest
+        labels: |
+          org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          build.source=github-actions
+          build.workflow=${{ github.workflow }}
+          build.run_id=${{ github.run_id }}
+          build.run_n
