@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 import re
 import csv
@@ -406,7 +406,7 @@ def save_label():
             'start_time': round(data['start_time'], 3),
             'end_time': round(data['end_time'], 3),
             'duration': round(data['end_time'] - data['start_time'], 3),
-            'labeled_at': __import__('datetime').datetime.now().isoformat()
+            'labeled_at': datetime.now().isoformat()
         }
         
         # Save to CSV file
@@ -568,7 +568,7 @@ def auto_load_data():
         except Exception as e:
             app.logger.error(f"Failed to auto-load CSV: {e}")
 
-@app.route('/')
+@app.route('/hello')
 def hello():
     return f'''
     <h1>Hello from Automated CI/CD Pipeline!</h1>
