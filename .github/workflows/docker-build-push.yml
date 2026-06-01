@@ -33,3 +33,39 @@ jobs:
             build.workflow=${{ github.workflow }}
             build.run_id=${{ github.run_id }}
             build.run_number=${{ github.run_number }}
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy latest Docker image to EC2 using SSM
+        run: |
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy latest cs6620-app Docker image from Docker Hub" \
+            --parameters 'commands=[
+              "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cs6620-app:latest",
+              "docker stop cs6620-app || true",
+              "docker rm cs6620-app || true",
+              "docker run -d -p 80:5000 --restart unless-stopped --name cs6620-app ${{ secrets.DOCKERHUB_USERNAME }}/cs6620-app:latest"
+            ]' \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "SSM command sent successfully."
+          echo "Command ID: $COMMAND_ID"
+
+      - name: Verify SSM command was sent
+        run: |
+          echo "Deployment command was sent to EC2 through AWS Systems Manager."
